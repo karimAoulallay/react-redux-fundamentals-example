@@ -1,7 +1,6 @@
 import { createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import rootReducer from './reducer'
-import { client } from './api/client'
 import { thunk } from 'redux-thunk'
 
 const composedEnhancer = composeWithDevTools(
@@ -11,13 +10,5 @@ const composedEnhancer = composeWithDevTools(
 )
 
 const store = createStore(rootReducer, composedEnhancer)
-
-const fetchTodos = async (dispatch, getState) => {
-  client.get('fakeApi/todos').then((todos) => {
-    dispatch({ type: 'todos/todosLoaded', payload: { todos } })
-  })
-}
-
-store.dispatch(fetchTodos)
 
 export default store

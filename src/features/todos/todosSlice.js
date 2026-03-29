@@ -1,3 +1,5 @@
+import { client } from '../../api/client'
+
 const initialState = []
 
 function nextTodoId(todos) {
@@ -55,10 +57,15 @@ export default function todosReducer(state = initialState, action) {
       return state.filter((todo) => !todo.completed)
     }
     case 'todos/todosLoaded': {
-      const todos = action.payload.todos.todos
-      return todos
+      // Replace the existing state entirely by returning the new value
+      return action.payload
     }
     default:
       return state
   }
+}
+
+export async function fetchTodos(dispatch, getState) {
+  const response = await client.get('/fakeApi/todos')
+  dispatch({ type: 'todos/todosLoaded', payload: response.todos })
 }
