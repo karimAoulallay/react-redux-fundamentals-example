@@ -1,12 +1,12 @@
 import { createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import rootReducer from './reducer'
-import { asyncFunctionMiddleware } from './exampleAddons/middleware'
 import { client } from './api/client'
+import { thunk } from 'redux-thunk'
 
 const composedEnhancer = composeWithDevTools(
   // Add whatever middleware you actually want to use here
-  applyMiddleware(asyncFunctionMiddleware)
+  applyMiddleware(thunk)
   // other store enhancers if any
 )
 
