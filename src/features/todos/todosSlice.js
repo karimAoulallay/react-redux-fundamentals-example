@@ -54,6 +54,10 @@ export default function todosReducer(state = initialState, action) {
     case 'todos/completedCleared': {
       return state.filter((todo) => !todo.completed)
     }
+    case 'todos/todosLoaded': {
+      const todos = action.payload.todos.todos
+      return todos
+    }
     default:
       return state
   }
