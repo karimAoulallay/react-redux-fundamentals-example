@@ -1,4 +1,5 @@
 import { client } from '../../api/client'
+import { todoAdded, todosLoaded } from './todosActions'
 
 const initialState = []
 
@@ -55,7 +56,7 @@ export default function todosReducer(state = initialState, action) {
 
 export async function fetchTodos(dispatch, getState) {
   const response = await client.get('/fakeApi/todos')
-  dispatch({ type: 'todos/todosLoaded', payload: response.todos })
+  dispatch(todosLoaded(response.todos))
 }
 
 // Write a synchronous outer function that receives the `text` parameter:
@@ -65,6 +66,6 @@ export function saveNewTodo(text) {
     // ✅ Now we can use the text value and send it to the server
     const initialTodo = { text }
     const response = await client.post('/fakeApi/todos', { todo: initialTodo })
-    dispatch({ type: 'todos/todoAdded', payload: response.todo })
+    dispatch(todoAdded(response.todo))
   }
 }
