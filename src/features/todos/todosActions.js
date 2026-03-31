@@ -8,3 +8,7 @@ export const todoAdded = (todo) => {
 export const todosLoaded = (todos) => {
   return { type: 'todos/todosLoaded', payload: todos }
 }
+
+export const allTodosCompleted = () => ({ type: 'todos/allCompleted' })
+
+export const clearCompletedTodos = () => ({ type: 'todos/completedCleared' })

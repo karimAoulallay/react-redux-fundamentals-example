@@ -1,9 +1,18 @@
-import React from 'react'
-
 import { availableColors, capitalize } from '../filters/colors'
 import { StatusFilters } from '../filters/filtersSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { allTodosCompleted, clearCompletedTodos } from '../todos/todosActions'
+import {
+  colorFilterChanged,
+  statusFilterChanged,
+} from '../filters/filtersActions'
 
-const RemainingTodos = ({ count }) => {
+const RemainingTodos = () => {
+  const remainingTodos = useSelector((state) => {
+    const todos = state.todos
+    return todos.filter((todo) => !todo.completed)
+  })
+  const count = remainingTodos.length
   const suffix = count === 1 ? '' : 's'
 
   return (
@@ -73,23 +82,40 @@ const ColorFilters = ({ value: colors, onChange }) => {
 }
 
 const Footer = () => {
-  const colors = []
-  const status = StatusFilters.All
-  const todosRemaining = 1
+  const dispatch = useDispatch()
 
-  const onColorChange = (color, changeType) =>
-    console.log('Color change: ', { color, changeType })
-  const onStatusChange = (status) => console.log('Status change: ', status)
+  const colors = useSelector((state) => state.filters.colors)
+  const status = useSelector((state) => state.filters.status)
+
+  const onColorChange = (color, changeType) => {
+    dispatch(colorFilterChanged({ color, changeType }))
+  }
+
+  const onStatusChange = (newStatus) => {
+    dispatch(statusFilterChanged(newStatus))
+  }
+
+  const onAllTodosCompleted = () => {
+    dispatch(allTodosCompleted())
+  }
+
+  const onClearCompletedTodos = () => {
+    dispatch(clearCompletedTodos())
+  }
 
   return (
     <footer className="footer">
       <div className="actions">
         <h5>Actions</h5>
-        <button className="button">Mark All Completed</button>
-        <button className="button">Clear Completed</button>
+        <button className="button" onClick={onAllTodosCompleted}>
+          Mark All Completed
+        </button>
+        <button className="button" onClick={onClearCompletedTodos}>
+          Clear Completed
+        </button>
       </div>
 
-      <RemainingTodos count={todosRemaining} />
+      <RemainingTodos />
       <StatusFilter value={status} onChange={onStatusChange} />
       <ColorFilters value={colors} onChange={onColorChange} />
     </footer>
