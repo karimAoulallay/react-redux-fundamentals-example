@@ -23,3 +23,8 @@ export const colorSelected = ({ todoId, color }) => ({
   type: 'todos/colorSelected',
   payload: { todoId: todoId, color },
 })
+
+export const todoDeleted = (todoId) => ({
+  type: 'todos/todoDeleted',
+  payload: todoId,
+})
