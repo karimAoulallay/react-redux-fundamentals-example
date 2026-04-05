@@ -1,18 +1,18 @@
-import { availableColors, capitalize } from '../filters/colors'
-import { StatusFilters } from '../filters/filtersSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import { allTodosCompleted, clearCompletedTodos } from '../todos/todosActions'
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   colorFilterChanged,
   statusFilterChanged,
-} from '../filters/filtersActions'
+  StatusFilters,
+} from '../filters/filtersSlice'
+import { availableColors, capitalize } from '../filters/colors'
+import {
+  allTodosCompleted,
+  completedTodosCleared,
+  selectTodos,
+} from '../todos/todosSlice'
 
-const RemainingTodos = () => {
-  const remainingTodos = useSelector((state) => {
-    const todos = state.todos
-    return todos.filter((todo) => !todo.completed)
-  })
-  const count = remainingTodos.length
+const RemainingTodos = ({ count }) => {
   const suffix = count === 1 ? '' : 's'
 
   return (
@@ -84,38 +84,36 @@ const ColorFilters = ({ value: colors, onChange }) => {
 const Footer = () => {
   const dispatch = useDispatch()
 
-  const colors = useSelector((state) => state.filters.colors)
-  const status = useSelector((state) => state.filters.status)
+  const todosRemaining = useSelector((state) => {
+    const uncompletedTodos = selectTodos(state).filter(
+      (todo) => !todo.completed
+    )
+    return uncompletedTodos.length
+  })
 
-  const onColorChange = (color, changeType) => {
-    dispatch(colorFilterChanged({ color, changeType }))
-  }
+  const { status, colors } = useSelector((state) => state.filters)
 
-  const onStatusChange = (newStatus) => {
-    dispatch(statusFilterChanged(newStatus))
-  }
+  const onMarkCompletedClicked = () => dispatch(allTodosCompleted())
+  const onClearCompletedClicked = () => dispatch(completedTodosCleared())
 
-  const onAllTodosCompleted = () => {
-    dispatch(allTodosCompleted())
-  }
+  const onColorChange = (color, changeType) =>
+    dispatch(colorFilterChanged(color, changeType))
 
-  const onClearCompletedTodos = () => {
-    dispatch(clearCompletedTodos())
-  }
+  const onStatusChange = (status) => dispatch(statusFilterChanged(status))
 
   return (
     <footer className="footer">
       <div className="actions">
         <h5>Actions</h5>
-        <button className="button" onClick={onAllTodosCompleted}>
+        <button className="button" onClick={onMarkCompletedClicked}>
           Mark All Completed
         </button>
-        <button className="button" onClick={onClearCompletedTodos}>
+        <button className="button" onClick={onClearCompletedClicked}>
           Clear Completed
         </button>
       </div>
 
-      <RemainingTodos />
+      <RemainingTodos count={todosRemaining} />
       <StatusFilter value={status} onChange={onStatusChange} />
       <ColorFilters value={colors} onChange={onColorChange} />
     </footer>

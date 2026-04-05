@@ -9,7 +9,7 @@ import store from './store'
 import { Provider } from 'react-redux'
 import { fetchTodos } from './features/todos/todosSlice'
 
-store.dispatch(fetchTodos)
+store.dispatch(fetchTodos())
 
 // 2. Select the DOM element
 const container = document.getElementById('root')

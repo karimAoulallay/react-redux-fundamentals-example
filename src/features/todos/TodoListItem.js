@@ -4,10 +4,7 @@ import { ReactComponent as TimesSolid } from './times-solid.svg'
 
 import { availableColors, capitalize } from '../filters/colors'
 import { colorSelected, todoDeleted, todoToggled } from './todosActions'
-
-const selectTodoById = (state, todoId) => {
-  return state.todos.find((todo) => todo.id === todoId)
-}
+import { selectTodoById } from './todosSlice'
 
 // Destructure `props.id`, since we just need the ID value
 const TodoListItem = ({ id }) => {
