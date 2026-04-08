@@ -1,30 +1,27 @@
-export const todoAdded = (todo) => {
-  return {
-    type: 'todos/todoAdded',
-    payload: todo,
-  }
-}
-
-export const todosLoaded = (todos) => ({
-  type: 'todos/todosLoaded',
-  payload: todos,
-})
-
-export const allTodosCompleted = () => ({ type: 'todos/allCompleted' })
-
-export const clearCompletedTodos = () => ({ type: 'todos/completedCleared' })
+export const todoAdded = (todo) => ({ type: 'todos/todoAdded', payload: todo })
 
 export const todoToggled = (todoId) => ({
   type: 'todos/todoToggled',
   payload: todoId,
 })
 
-export const colorSelected = ({ todoId, color }) => ({
+export const todoColorSelected = (todoId, color) => ({
   type: 'todos/colorSelected',
-  payload: { todoId: todoId, color },
+  payload: { todoId, color },
 })
 
 export const todoDeleted = (todoId) => ({
   type: 'todos/todoDeleted',
   payload: todoId,
+})
+
+export const allTodosCompleted = () => ({ type: 'todos/allCompleted' })
+
+export const completedTodosCleared = () => ({ type: 'todos/completedCleared' })
+
+export const todosLoading = () => ({ type: 'todos/todosLoading' })
+
+export const todosLoaded = (todos) => ({
+  type: 'todos/todosLoaded',
+  payload: todos,
 })

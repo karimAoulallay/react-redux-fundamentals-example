@@ -6,11 +6,8 @@ import {
   StatusFilters,
 } from '../filters/filtersSlice'
 import { availableColors, capitalize } from '../filters/colors'
-import {
-  allTodosCompleted,
-  completedTodosCleared,
-  selectTodos,
-} from '../todos/todosSlice'
+import { allTodosCompleted, completedTodosCleared } from '../todos/todosActions'
+import { selectFilteredTodos } from '../todos/todosSlice'
 
 const RemainingTodos = ({ count }) => {
   const suffix = count === 1 ? '' : 's'
@@ -85,7 +82,7 @@ const Footer = () => {
   const dispatch = useDispatch()
 
   const todosRemaining = useSelector((state) => {
-    const uncompletedTodos = selectTodos(state).filter(
+    const uncompletedTodos = selectFilteredTodos(state).filter(
       (todo) => !todo.completed
     )
     return uncompletedTodos.length

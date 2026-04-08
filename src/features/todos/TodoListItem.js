@@ -3,13 +3,14 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ReactComponent as TimesSolid } from './times-solid.svg'
 
 import { availableColors, capitalize } from '../filters/colors'
-import { colorSelected, todoDeleted, todoToggled } from './todosActions'
+import { todoColorSelected, todoDeleted, todoToggled } from './todosActions'
 import { selectTodoById } from './todosSlice'
 
 // Destructure `props.id`, since we just need the ID value
 const TodoListItem = ({ id }) => {
   // Call our `selectTodoById` with the state _and_ the ID value
   const todo = useSelector((state) => selectTodoById(state, id))
+
   const { text, completed, color } = todo
 
   const dispatch = useDispatch()
@@ -20,7 +21,7 @@ const TodoListItem = ({ id }) => {
 
   const handleColorChanged = (e) => {
     const color = e.target.value
-    dispatch(colorSelected({ todoId: todo.id, color }))
+    dispatch(todoColorSelected(todo.id, color))
   }
 
   const onDelete = () => {
