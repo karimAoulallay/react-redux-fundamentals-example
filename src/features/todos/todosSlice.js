@@ -1,12 +1,19 @@
-import { StatusFilters } from '../filters/filtersSlice'
+import {
+  createSlice,
+  createSelector,
+  createAsyncThunk,
+  createEntityAdapter,
+} from '@reduxjs/toolkit'
 import { client } from '../../api/client'
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
+import { StatusFilters } from '../filters/filtersSlice'
 
-const initialState = {
+const todosAdapter = createEntityAdapter()
+
+const initialState = todosAdapter.getInitialState({
   status: 'idle',
-  entities: {},
-}
+})
 
+// Thunk functions
 export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
   const response = await client.get('/fakeApi/todos')
   return response.todos
@@ -25,20 +32,10 @@ const todosSlice = createSlice({
   name: 'todos',
   initialState,
   reducers: {
-    todoAdded(state, action) {
-      const todo = action.payload
-      state.entities[todo.id] = todo
-    },
     todoToggled(state, action) {
       const todoId = action.payload
       const todo = state.entities[todoId]
       todo.completed = !todo.completed
-    },
-    todosLoading(state, action) {
-      return {
-        ...state,
-        status: 'loading',
-      }
     },
     colorSelected: {
       reducer(state, action) {
@@ -51,24 +48,17 @@ const todosSlice = createSlice({
         }
       },
     },
-    todoDeleted(state, action) {
-      delete state.entities[action.payload]
-    },
+    todoDeleted: todosAdapter.removeOne,
     allCompleted(state, action) {
-      Object.values(state.entities).forEach((todo) => (todo.completed = true))
+      Object.values(state.entities).forEach((todo) => {
+        todo.completed = true
+      })
     },
     completedCleared(state, action) {
-      Object.values(state.entities).forEach((todo) => {
-        if (todo.completed) {
-          delete state.entities[todo.id]
-        }
-      })
-    },
-    todosLoaded(state, action) {
-      action.payload.forEach((todo) => {
-        state.entities[todo.id] = todo
-      })
-      state.status = 'loaded'
+      const completedIds = Object.values(state.entities)
+        .filter((todo) => todo.completed)
+        .map((todo) => todo.id)
+      todosAdapter.removeMany(state, completedIds)
     },
   },
   extraReducers: (builder) => {
@@ -77,29 +67,23 @@ const todosSlice = createSlice({
         state.status = 'loading'
       })
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        const newEntities = {}
-        action.payload.forEach((todo) => {
-          newEntities[todo.id] = todo
-        })
-        state.entities = newEntities
+        todosAdapter.setAll(state, action.payload)
         state.status = 'idle'
       })
-      .addCase(saveNewTodo.fulfilled, (state, action) => {
-        const todo = action.payload
-        state.entities[todo.id] = todo
-      })
+      .addCase(saveNewTodo.fulfilled, todosAdapter.addOne)
   },
 })
 
-const selectTodoEntities = (state) => state.todos.entities
+export const { selectAll: selectTodos, selectById: selectTodoById } =
+  todosAdapter.getSelectors((state) => state.todos)
 
-export const selectTodos = createSelector(selectTodoEntities, (entities) =>
-  Object.values(entities)
+export const selectTodoIds = createSelector(
+  // First, pass one or more "input selector" functions:
+  selectTodos,
+  // Then, an "output selector" that receives all the input results as arguments
+  // and returns a final result value
+  (todos) => todos.map((todo) => todo.id)
 )
-
-export const selectTodoById = (state, todoId) => {
-  return selectTodoEntities(state)[todoId]
-}
 
 export const selectFilteredTodos = createSelector(
   // First input selector: all todos
@@ -132,16 +116,18 @@ export const selectFilteredTodoIds = createSelector(
   (filteredTodos) => filteredTodos.map((todo) => todo.id)
 )
 
-export const getTodosStatus = (state) => state.todos.status
+export const getTodosStatus = (state, action) => {
+  const status = state.todos.status
+  return status
+}
 
 export const {
   allCompleted,
-  colorSelected,
   completedCleared,
+  todoAdded,
+  colorSelected,
   todoDeleted,
   todoToggled,
-  todoAdded,
-  todosLoaded,
-  todosLoading,
 } = todosSlice.actions
+
 export default todosSlice.reducer
